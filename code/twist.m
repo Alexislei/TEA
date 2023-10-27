@@ -1,12 +1,9 @@
 
 function [ tensor_X ] = twist( X )
-%TWIST 此处显示有关此函数的摘要
-%   此处显示详细说明
-    % 构造矩阵X对应的张量
-    % 输入：矩阵X，大小m*n
-    % 输出：张量tensor_X, 大小m*1*n
+% twist function: rotate a 2-dim individual to a 3-order tensor while preserving numerical property
+% input: a two-dim individual锛屽ぇ灏弇*n
+% output: a third-order individual tensor_X, size m*1*n
     [m,n]=size(X);
     tensor_X = reshape(X,m,1,n);
-
 end
 
