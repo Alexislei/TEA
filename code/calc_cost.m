@@ -1,14 +1,11 @@
 
-function [ cost ] = calc_cost(pop,F,C,M)
-%CALC_COST 此处显示有关此函数的摘要
-
+function [ fit ] = evaluate(pop,F,C,M)
+% Evaluation function: evaluate the fitness of each individual
     [~,~,popsize]=size(pop);
-    cost=zeros(popsize,1); % 适应值保存为popsize*1的向量
-    for i=1:popsize
-%         pop(:,:,i)
-        D=calc_dist(pop(:,:,i),M); % rectangular distance
-        totalCost=sum(sum(F.*C.*D));
-        cost(i,:)=totalCost;
+    fit=zeros(popsize,1); % fitness vector
+    for i=1:popsize 
+        cost=calc_fit(pop(:,:,i),M); % define the fitness function based on the target problem
+        fit(i,:)=cost;
     end
 end
 
