@@ -1,7 +1,4 @@
-# TEA
-Tensorial Evolutionary Algorithm for Spatial Optimization Problems
-TEA_v1
-
+# TEA_v1
 This is a simple version of the Tensorial Evolutionary Algorithm (TEA). The codes are written in Matlab.
 
 If you have any questions, please contact me by cssclei@outlook.com.
