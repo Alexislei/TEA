@@ -14,6 +14,6 @@ pmg=param(:,6); % mutation rate global
 load data_kazeroon.mat
 Ge=2000;
 params=[200 Ge 0.04 0.6 0.08 0.01];
-[cost_best,pop_per_gen]=main_func_n1_1(params,F,C);
-save(['n1_1_',num2str(double(a)),'.mat'],'cost_best','pop_per_gen');
+[fit_best,pop_best]=main_func_TEA(params); % require params and any problem-dependent data
+save(['result_TEA','.mat'],'fit_best','pop_best');
 
