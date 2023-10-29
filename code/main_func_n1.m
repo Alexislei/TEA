@@ -11,15 +11,15 @@ function [cost_best,pop_per_gen] = main_func_n1(param,F,C)
     M=24; % number of machines
     m_grids=5; n_grids=6; % grid size
 
-    pop=init_gen(popsize,m_grids,n_grids,M); % ³õÊ¼»¯µÚÒ»´ú
-    fit= calc_fit(pop,F,C,M);
+    pop=init_gen(params.popsize,params.m,params.n); % åˆå§‹åŒ–ç¬¬ä¸€ä»£
+    fit=evaluate(pop,data);
 
-    pop_new=[]; %´æ´¢ĞÂµÄÒ»´ú
+    pop_new=[]; %å­˜å‚¨æ–°çš„ä¸€ä»£
     pop_per_gen=zeros(Gen+1,m_grids,n_grids,popsize);
     pop_per_gen(1,:,:,:)=pop;
     
     for t=1:Gen
-        % ¸´ÖÆÉÙÁ¿×îÓÅ¸öÌåÌæ»»×î²î¸öÌå
+        % å¤åˆ¶å°‘é‡æœ€ä¼˜ä¸ªä½“æ›¿æ¢æœ€å·®ä¸ªä½“
         [pop, fit] = re_gen(pop,fit,R);
         %%
         % selection operator: select #popsize chromosomes from population
@@ -40,19 +40,19 @@ function [cost_best,pop_per_gen] = main_func_n1(param,F,C)
 end
 
 function [ pop ] = init_gen( popsize,m_grid,n_grid,M )
-%INIT_GEN ´Ë´¦ÏÔÊ¾ÓĞ¹Ø´Ëº¯ÊıµÄÕªÒª
-%   ´Ë´¦ÏÔÊ¾ÏêÏ¸ËµÃ÷
+%INIT_GEN æ­¤å¤„æ˜¾ç¤ºæœ‰å…³æ­¤å‡½æ•°çš„æ‘˜è¦
+%   æ­¤å¤„æ˜¾ç¤ºè¯¦ç»†è¯´æ˜
     pop=zeros(m_grid,n_grid,popsize);
     % num of objects to be processed
-    nobjs=M; % if nobjs=m_grids*n_grids,ÅĞ¶¨ÊÇ·ñ´æÔÚ¿Õ½Úµã -1±íÊ¾Ò»¸örestricted area£¬0±íÊ¾ a dummy machine
+    nobjs=M; % if nobjs=m_grids*n_grids,åˆ¤å®šæ˜¯å¦å­˜åœ¨ç©ºèŠ‚ç‚¹ -1è¡¨ç¤ºä¸€ä¸ªrestricted areaï¼Œ0è¡¨ç¤º a dummy machine
 
     for i=1:popsize
         chrom=pop(:,:,i);
-        for k=1:nobjs %´Ó1µ½nobjs
-            % Ëæ»úÉú³ÉÎ»ÖÃ (x,y),[1-m_grids],[1-n_grids]Ëæ»úÕıÕûÊı
+        for k=1:nobjs %ä»1åˆ°nobjs
+            % éšæœºç”Ÿæˆä½ç½® (x,y),[1-m_grids],[1-n_grids]éšæœºæ­£æ•´æ•°
             x=unidrnd(m_grid);
             y=unidrnd(n_grid);
-            while chrom(x,y)~=0 %ÅĞ¶Ï¸ÃÎ»ÖÃÊÇ·ñÎª¿Õ,½ûÖ¹Çø»òÕß±»·ÖÅä
+            while chrom(x,y)~=0 %åˆ¤æ–­è¯¥ä½ç½®æ˜¯å¦ä¸ºç©º,ç¦æ­¢åŒºæˆ–è€…è¢«åˆ†é…
                 x=unidrnd(m_grid);
                 y=unidrnd(n_grid);
             end
@@ -63,17 +63,17 @@ function [ pop ] = init_gen( popsize,m_grid,n_grid,M )
 end
 
 function [ pop_new ] = crossover_n1( pop,pc )
-    %crossover  ½»²æÇøÓòÎªĞĞºÍÁĞµÄ»ìºÏÇøÓò£¬Ò»´ÎÕÅÁ¿»ı
+    %crossover  äº¤å‰åŒºåŸŸä¸ºè¡Œå’Œåˆ—çš„æ··åˆåŒºåŸŸï¼Œä¸€æ¬¡å¼ é‡ç§¯
     [m,n,popsize]=size(pop); 
     pop_new=zeros(m,n,popsize);
      
     for k=1:2:(popsize-1)
         cid=randperm(popsize,2);
-        % Á½¸öÈ¾É«ÌåµÄÈı½×ÕÅÁ¿
+        % ä¸¤ä¸ªæŸ“è‰²ä½“çš„ä¸‰é˜¶å¼ é‡
         X(:,:,1)=pop(:,:,cid(1,1));
         X(:,:,2)=pop(:,:,cid(1,2));
         if rand<pc
-            %±ä»»ÕÅÁ¿,Ëæ»úÑ¡Ôñ½»»»µÄĞĞ£¬ÁĞ£¬»á²úÉúÁ½¸öÍ¬Ê±½»»»µÄÇøÓò
+            %å˜æ¢å¼ é‡,éšæœºé€‰æ‹©äº¤æ¢çš„è¡Œï¼Œåˆ—ï¼Œä¼šäº§ç”Ÿä¸¤ä¸ªåŒæ—¶äº¤æ¢çš„åŒºåŸŸ
             %strating point of selected rows & columns
             sp_r=unidrnd(m); 
             sp_c=unidrnd(n);
@@ -119,7 +119,7 @@ function [ pop_new ] = crossover_n1( pop,pc )
 end
 
 function [ pop_new , fit_new] = re_gen(pop,fitness,R)
-%REPRODUCE ´Ë´¦ÏÔÊ¾ÓĞ¹Ø´Ëº¯ÊıµÄÕªÒª
+%REPRODUCE æ­¤å¤„æ˜¾ç¤ºæœ‰å…³æ­¤å‡½æ•°çš„æ‘˜è¦
 % remove the worst chromosomes floor(popsize*R)
 % duplicating and inserting the best chromosomes into the current
 % population
@@ -132,34 +132,34 @@ function [ pop_new , fit_new] = re_gen(pop,fitness,R)
     [~,ind_worst]=sort(fitness,'ascend'); % worst chromosomes
     [~,ind_best]=sort(fitness,'descend'); % best chromosomes
     
-    pop_new(:,:,ind_worst(1:num,:))=pop(:,:,ind_best(1:num,:)); % ¸´ÖÆ×îÓÅµÄ¸öÌåÌæ»»×î²îµÄ¸öÌå
+    pop_new(:,:,ind_worst(1:num,:))=pop(:,:,ind_best(1:num,:)); % å¤åˆ¶æœ€ä¼˜çš„ä¸ªä½“æ›¿æ¢æœ€å·®çš„ä¸ªä½“
     fit_new(ind_worst(1:num,:),:)=fitness(ind_best(1:num,:),:);
 
 end
 
 function [ pop_new ] = select_rssr(pop,fitness)
-%SELECT ´Ë´¦ÏÔÊ¾ÓĞ¹Ø´Ëº¯ÊıµÄÕªÒª
-%   remainder stochastic sampling with replacement ÎŞ»Ø·ÅÓàÊıËæ»úÑ¡Ôñ
-% ¼ÆËãÈºÌåÖĞÃ¿¸ö¸öÌåÔÚÏÂÒ»´úÈºÌåÖĞµÄÉú´æÆÚÍûÊıÄ¿£¬ÕûÊı²¿·ÖÎªÃ¿¸ö¸öÌåÔÚÏÂÒ»´úÈºÌåÖĞµÄÉú´æÊıÄ¿
+%SELECT æ­¤å¤„æ˜¾ç¤ºæœ‰å…³æ­¤å‡½æ•°çš„æ‘˜è¦
+%   remainder stochastic sampling with replacement æ— å›æ”¾ä½™æ•°éšæœºé€‰æ‹©
+% è®¡ç®—ç¾¤ä½“ä¸­æ¯ä¸ªä¸ªä½“åœ¨ä¸‹ä¸€ä»£ç¾¤ä½“ä¸­çš„ç”Ÿå­˜æœŸæœ›æ•°ç›®ï¼Œæ•´æ•°éƒ¨åˆ†ä¸ºæ¯ä¸ªä¸ªä½“åœ¨ä¸‹ä¸€ä»£ç¾¤ä½“ä¸­çš„ç”Ÿå­˜æ•°ç›®
     
     [m,n,popsize]=size(pop);
     
-    %¼ÆËãÈºÌåÖĞÃ¿¸ö¸öÌåÔÚÏÂÒ»´úÈºÌåÖĞµÄÉú´æÆÚÍûÊıÄ¿    
+    %è®¡ç®—ç¾¤ä½“ä¸­æ¯ä¸ªä¸ªä½“åœ¨ä¸‹ä¸€ä»£ç¾¤ä½“ä¸­çš„ç”Ÿå­˜æœŸæœ›æ•°ç›®    
 %     num_expectation = zeros(popsize,1);
     num_expectation=popsize.*(fitness./sum(fitness));
 
-    %È¡Éú´æÆÚÍûÊıÄ¿ÕûÊı²¿·Ö×÷Îª¶ÔÓ¦¸öÌåÔÚÏÂÒ»´úÈºÌåÖĞµÄÉú´æÊıÄ¿
-    %sum(num_expectation_int)¿ÉÒÔÈ·¶¨³öÏÂÒ»´úÈºÌåµÄ¸öÊı
+    %å–ç”Ÿå­˜æœŸæœ›æ•°ç›®æ•´æ•°éƒ¨åˆ†ä½œä¸ºå¯¹åº”ä¸ªä½“åœ¨ä¸‹ä¸€ä»£ç¾¤ä½“ä¸­çš„ç”Ÿå­˜æ•°ç›®
+    %sum(num_expectation_int)å¯ä»¥ç¡®å®šå‡ºä¸‹ä¸€ä»£ç¾¤ä½“çš„ä¸ªæ•°
     num_expectation_int = floor(num_expectation);
     
-    %ÓÃÓÚ´æ·ÅĞÂµÄ¸öÌå
+    %ç”¨äºå­˜æ”¾æ–°çš„ä¸ªä½“
     pop_new=zeros(m,n,popsize); 
     
-    %ÒÔÏÂ·½·¨Îª°´ÕÕÉú´æÆÚÍûÑ¡ÔñµÄ¸öÌå
-    s=0;%¼ÆÊı£¬ÓÃÓÚ±ê¼ÇĞÂµÄÈºÌåÖĞ¸öÊı
+    %ä»¥ä¸‹æ–¹æ³•ä¸ºæŒ‰ç…§ç”Ÿå­˜æœŸæœ›é€‰æ‹©çš„ä¸ªä½“
+    s=0;%è®¡æ•°ï¼Œç”¨äºæ ‡è®°æ–°çš„ç¾¤ä½“ä¸­ä¸ªæ•°
     for i=1:popsize
         if num_expectation_int(i)~=0
-            a=[];%ÓÃÓÚ±êÊ¶ÈºÌåÖĞµÄ¸öÌå
+            a=[];%ç”¨äºæ ‡è¯†ç¾¤ä½“ä¸­çš„ä¸ªä½“
             for j=1:num_expectation_int(i)
                 if j==1
                     a(:,:,1)=pop(:,:,i);
@@ -172,22 +172,22 @@ function [ pop_new ] = select_rssr(pop,fitness)
         end
     end
     
-    %¼ÆËãĞÂµÄÊÊÓ¦¶È
-    %È·¶¨ÏÂÒ»´úÖĞ»¹Î´È·¶¨µÄµÄ n - sum(num_expectation_int)¸ö¸öÌå
-    fitness_new=num_expectation-num_expectation_int; %Ğ¡Êı²¿·ÖÓÃÀ´¼ÆËãÂÖÅÌ¶ÄµÄÑ¡Ôñ¸ÅÂÊ
+    %è®¡ç®—æ–°çš„é€‚åº”åº¦
+    %ç¡®å®šä¸‹ä¸€ä»£ä¸­è¿˜æœªç¡®å®šçš„çš„ n - sum(num_expectation_int)ä¸ªä¸ªä½“
+    fitness_new=num_expectation-num_expectation_int; %å°æ•°éƒ¨åˆ†ç”¨æ¥è®¡ç®—è½®ç›˜èµŒçš„é€‰æ‹©æ¦‚ç‡
 %         fitness_new=fitness-sum(fitness).*num_expectation_int./popsize;
 %     for i=1:popsize
 %         fitness_new(i)=fitness(i) - num_expectation_int(i)*sum(fitness)/popsize; %num_expectation=popsize.*(fitness./sum(fitness))
 %     end
     
-    %ÒÔÏÂÎª°´ÕÕÂÖÅÌ¶ÄÑ¡ÔñÊ£ÓàµÄ¸öÌå
-    %ÒÔfitness_newÎª¸÷¸ö¸öÌåµÄĞÂµÄÊÊÓ¦¶È£¬ÔÙÓÃ»ù±¾µÄ±ÈÀıÑ¡Ôñ·½·¨À´Ëæ»úÈ·¶¨ÏÂÒ»´úÈºÌåÖĞÊ£ÓàÎ´È·¶¨µÄ¸öÌå
-    %Tips:µ±VÎªÈ«ÁãÏòÁ¿Ê±£¬¸ÃËã·¨ÎŞĞ§£¬½«Ëæ»úÑ¡Ôñ¸öÌå;·ñÔòËã·¨½«´ÓÖØÒªĞÔÖ¸±ê²»Îª0µÄ¸öÌåÖĞÑ¡Ôñ¡£
-    %index:Ñ¡µÄnum_remain¸ö¸öÌåµÄÎ»ÖÃË÷Òı 
+    %ä»¥ä¸‹ä¸ºæŒ‰ç…§è½®ç›˜èµŒé€‰æ‹©å‰©ä½™çš„ä¸ªä½“
+    %ä»¥fitness_newä¸ºå„ä¸ªä¸ªä½“çš„æ–°çš„é€‚åº”åº¦ï¼Œå†ç”¨åŸºæœ¬çš„æ¯”ä¾‹é€‰æ‹©æ–¹æ³•æ¥éšæœºç¡®å®šä¸‹ä¸€ä»£ç¾¤ä½“ä¸­å‰©ä½™æœªç¡®å®šçš„ä¸ªä½“
+    %Tips:å½“Vä¸ºå…¨é›¶å‘é‡æ—¶ï¼Œè¯¥ç®—æ³•æ— æ•ˆï¼Œå°†éšæœºé€‰æ‹©ä¸ªä½“;å¦åˆ™ç®—æ³•å°†ä»é‡è¦æ€§æŒ‡æ ‡ä¸ä¸º0çš„ä¸ªä½“ä¸­é€‰æ‹©ã€‚
+    %index:é€‰çš„num_remainä¸ªä¸ªä½“çš„ä½ç½®ç´¢å¼• 
     
-    %Ê£ÏÂµÄĞèÒªÂÖÅÌ¶ÄµÄ¸öÊı num_remain = popsize - s;
+    %å‰©ä¸‹çš„éœ€è¦è½®ç›˜èµŒçš„ä¸ªæ•° num_remain = popsize - s;
     num_remain=popsize-s;
-    fitness_table = cumsum(fitness_new./sum(fitness_new));%ÀÛ¼Ó fitness_table = zeros(popsize,1);
+    fitness_table = cumsum(fitness_new./sum(fitness_new));%ç´¯åŠ  fitness_table = zeros(popsize,1);
     pop_remain=[];
     rs=sort(rand(num_remain,1));
     fiti=1;
@@ -208,9 +208,9 @@ function [ pop_new ] = mutate_local(pop,pm)
     pop_new=zeros(m,n,popsize);
         
     for i=1:popsize 
-%         ind=unidrnd(popsize); %Ñ¡ÔñµÄ¸¸¸öÌå
+%         ind=unidrnd(popsize); %é€‰æ‹©çš„çˆ¶ä¸ªä½“
         ind=i;
-        if rand<pm %ÅĞ¶ÏÊÇ·ñ±äÒì
+        if rand<pm %åˆ¤æ–­æ˜¯å¦å˜å¼‚
             off=abs(round(mutate_convlike(pop(:,:,ind))));
            %% repair mechanism
             off=repair_m(off,pop(:,:,ind));
@@ -222,7 +222,7 @@ function [ pop_new ] = mutate_local(pop,pm)
 end
 
 function [ pop_new ] = mutate_global(pop,pm)
-%MUTATE µ¥µã±äÒì
+%MUTATE å•ç‚¹å˜å¼‚
     ub=0;lb=24;
     [m,n,popsize]=size(pop); 
     mu_ind=rand(m,n,popsize)<pm;
@@ -244,31 +244,31 @@ function [ pop_new ] = mutate_global(pop,pm)
 end
 
 function [ X_new ] = mutate_convlike(X)
-%CROSSOVER_CONVLIKE ´Ë´¦ÏÔÊ¾ÓĞ¹Ø´Ëº¯ÊıµÄÕªÒª
+%CROSSOVER_CONVLIKE æ­¤å¤„æ˜¾ç¤ºæœ‰å…³æ­¤å‡½æ•°çš„æ‘˜è¦
 %   convolution-like operation
-% ÀûÓÃÕÅÁ¿³Ë»ıµÄ±íÊ¾ĞÎÊ½£¬¹¹ÔìµÄÕÅÁ¿A¸ù¾İÎÊÌâ¶¨ÒåÉè¼Æ
+% åˆ©ç”¨å¼ é‡ä¹˜ç§¯çš„è¡¨ç¤ºå½¢å¼ï¼Œæ„é€ çš„å¼ é‡Aæ ¹æ®é—®é¢˜å®šä¹‰è®¾è®¡
 
-    [m,n]=size(X);%X´óĞ¡m*n
+    [m,n]=size(X);%Xå¤§å°m*n
 
-    % ÎªÁËÆ¥ÅäÕÅÁ¿ÔËËãµÄÎ¬¶È£¬½«Ã¿¸ö¸öÌå½øĞĞpadding£¬ËÄÖÜÌî³ä0
-    X=padarray(X,[1 1],'symmetric','both'); %´óĞ¡±äÎªm+2*n+2
+    % ä¸ºäº†åŒ¹é…å¼ é‡è¿ç®—çš„ç»´åº¦ï¼Œå°†æ¯ä¸ªä¸ªä½“è¿›è¡Œpaddingï¼Œå››å‘¨å¡«å……0
+    X=padarray(X,[1 1],'symmetric','both'); %å¤§å°å˜ä¸ºm+2*n+2
 
-    % ¸öÌå×ª»»³Étensor,¼´¶şÎ¬¾ØÕóÍ¨¹ıtwistĞı×ª×ª»¯³Étensor 
-    tensor_X=twist(X); %´óĞ¡m*1*n
+    % ä¸ªä½“è½¬æ¢æˆtensor,å³äºŒç»´çŸ©é˜µé€šè¿‡twistæ—‹è½¬è½¬åŒ–æˆtensor 
+    tensor_X=twist(X); %å¤§å°m*1*n
 
     % block vectorize: bv_X=bvec(tensor_X);
  
-   %% ¹¹Ôìtransform tensor£¬´óĞ¡l1,l2,l3
+   %% æ„é€ transform tensorï¼Œå¤§å°l1,l2,l3
     l1=m+2;l2=m+2;l3=n+2; 
     A=zeros(l1,l2,l3); % Creates a l1 x l2 x l3 tensor of zeros
-    %¾ùÖµºË
+    %å‡å€¼æ ¸
     for i=2:l1-1
         A(i,i-1:i+1,1)=[1 1 1];
         A(i,i-1:i+1,2)=[1 1 1];
     end
     A(:,:,l3)=A(:,:,2);
     A=A/9;
-    %¸ßË¹ºË
+    %é«˜æ–¯æ ¸
 %     for i=2:l1-1
 %         A(i,i-1:i+1,1)=[2 4 2];
 %         A(i,i-1:i+1,2)=[1 2 1];
@@ -279,10 +279,10 @@ function [ X_new ] = mutate_convlike(X)
     %t-product
     X_new=tprod(A,tensor_X);
 
-    % ½«ĞÂµÃµ½µÄtensorĞı×ªµÃµ½¾ØÕó£¬È»ºó´ÓÖĞÌáÈ¡unpadding¸öÌå
+    % å°†æ–°å¾—åˆ°çš„tensoræ—‹è½¬å¾—åˆ°çŸ©é˜µï¼Œç„¶åä»ä¸­æå–unpaddingä¸ªä½“
     X_new=squeeze(X_new);
     X_new=X_new(2:end-1,2:end-1);
 
 end
 
-% ¸ßË¹£¨0,1) or (0,0.1)
+% é«˜æ–¯ï¼ˆ0,1) or (0,0.1)
