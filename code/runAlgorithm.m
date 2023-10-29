@@ -1,7 +1,19 @@
 clear all
 clc
 
-% Configure any of these parameters to match needs of given problems
+% Configure any of these parameters to match the needs of given problems
+
+
+
+params.gen=gen; % number of generations
+params.popsize=popsize; % population size
+params.m=m;
+params.n=n;
+params.pc=pc;
+params.pml=pml;
+params.pmg=pmg;
+
+
 
 popsize=param(:,1); % population size P
 Gen=param(:,2); % generation size
