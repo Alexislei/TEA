@@ -1,31 +1,15 @@
 clear all
 clc
 
-% Configure any of these parameters to match the needs of given problems
-
-
-
+% Configure any of these parameters to match the needs of given problem
 params.gen=gen; % number of generations
 params.popsize=popsize; % population size
-params.m=m;
-params.n=n;
-params.pc=pc;
-params.pml=pml;
-params.pmg=pmg;
+params.m=m; params.n=n; % individual size
+params.pc=pc; % crossover rate
+params.pml=pml; % mutation rate local
+params.pmg=pmg; % mutation rate global
 
-
-
-popsize=param(:,1); % population size P
-Gen=param(:,2); % generation size
-R=param(:,3); % the percentage of replication of well-performed chromosomes  5%
-pc=param(:,4); % crossover rate
-pml=param(:,5); % mutation rate local
-pmg=param(:,6); % mutation rate global
-
-
-load data_kazeroon.mat
-Ge=2000;
-params=[200 Ge 0.04 0.6 0.08 0.01];
-[fit_best,pop_best]=main_func_TEA(params); % require params and any problem-dependent data
-save(['result_TEA','.mat'],'fit_best','pop_best');
+data=load("data_kazeroon.mat");
+[fit_best,pop_best]=main_func_TEA(params,data); % require parameters and any problem-dependent data
+save(['result_TEA','.mat'],'fit_best','pop_best','-v7.3');
 
